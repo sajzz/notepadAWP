@@ -7,8 +7,10 @@ package server;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import static java.lang.System.in;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Scanner;
 
 /**
  *
@@ -34,21 +36,18 @@ public class Server {
             System.out.println(e.toString());
         }
     }
-    public static String sendString(){
-        return data;                        //This function is to be called in GUI function
-    }
-    public static String data="";
-static class MyThread extends Thread{
+}
+class MyThread extends Thread{
 	Socket socket;
 	MyThread(Socket s){
 		socket=s;
 		start();
 	}
+        static String data="";
         @Override
 	public void run(){
-		try{
+            try{
 			DataInputStream din= new DataInputStream(socket.getInputStream());
-                            
 			    while(!(data.equals("stop"))){
 				data= din.readUTF();
 			    }
@@ -57,7 +56,10 @@ static class MyThread extends Thread{
 			e2.printStackTrace();
 		}
 	}
+        public static String sendString(){
+            return data;                        //This function is to be called in GUI function
+        }
 }
-}
+
 
 
