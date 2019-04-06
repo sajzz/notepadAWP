@@ -1,0 +1,2 @@
+# notepadAWP
+The server code makes the connection and runs the thread from MyThread class. Here it is only taking read inputs from client machine, it is job of Design code to print the inputs by calling the sendString function repeatedly(From design code of client). For merging data, client code will call the sendString function values of other client(From which the former client wants the data). 
