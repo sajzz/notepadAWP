@@ -3,63 +3,100 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package server;
-
-import java.io.DataInputStream;
-import java.io.IOException;
-import static java.lang.System.in;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.Scanner;
+//package server1;
 
 /**
  *
- * @author Shikhin
+ * @author abc
+ */
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ *
+ * @author abc
  */
 public class Server {
-
-    /**
-     *
-     * @param args
-     */
-    public static synchronized void main(String[] args) {
+    public static void main(String[] args) {
         try {
-            ServerSocket server= new ServerSocket(5000);
+            ServerSocket server= new ServerSocket(5004);
 			while(true){
-                            System.out.println("Server is waiting for the request");
-                            Socket socket= server.accept();
-                            System.out.println("Connection established");
-                            new MyThread(socket);
+				System.out.println("Server is waiting for the request");
+                Socket socket= server.accept();
+				System.out.println("Connection established");
+				new MyThread(socket);
+                                new WriteThread(socket);
 			}
 			
-        } catch (IOException e) {
-            System.out.println(e.toString());
+        } catch (IOException ex) {
+            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
+
+
 class MyThread extends Thread{
 	Socket socket;
 	MyThread(Socket s){
 		socket=s;
 		start();
 	}
-        static String data="";
-        @Override
 	public void run(){
-            try{
+		try{
 			DataInputStream din= new DataInputStream(socket.getInputStream());
-			    while(!(data.equals("stop"))){
-				data= din.readUTF();
-			    }
-		}
-                catch(Exception e2){
+              String data="";
+			  while(!(data.equals("stop"))){
+				  data= din.readUTF();
+              System.out.println(data);
+			  }
+		}catch(Exception e2){
 			e2.printStackTrace();
 		}
 	}
-        public static String sendString(){
-            return data;                        //This function is to be called in GUI function
-        }
 }
 
 
-
+class WriteThread extends Thread{
+    Socket socket;
+    Scanner sc;
+    DataOutputStream dout;
+    public WriteThread(Socket s){
+        socket=s;
+        sc= new Scanner(System.in);
+        try {
+            dout= new DataOutputStream(socket.getOutputStream());
+        } catch (IOException ex) {
+            System.out.println("Caught");
+        }
+        start();
+    }
+    public void run(){
+        String msg="";
+        while(!(msg.equals("stop"))){
+            System.out.println("Enter data");
+            msg=sc.nextLine();
+            try {
+                dout.writeUTF(msg);
+            } catch (IOException ex) {
+                System.out.println("Caught");
+                try {
+                    dout.close();
+                } catch (IOException ex1) {
+                    System.out.println("caught");
+                }
+            }
+        }
+        try {
+            dout.close();
+        } catch (IOException ex) {
+            System.out.println("caught");
+        }
+    }
+}
